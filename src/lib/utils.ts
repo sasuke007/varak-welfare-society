@@ -69,3 +69,10 @@ export function timeAgo(date: Date | string): string {
   if (diffMins > 0) return `${diffMins}m ago`;
   return "just now";
 }
+
+export function daysLeft(endDate: Date | string): number {
+  const end = new Date(endDate);
+  const now = new Date();
+  const diffMs = end.getTime() - now.getTime();
+  return Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+}

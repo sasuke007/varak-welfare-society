@@ -83,9 +83,9 @@ const ribbonColors = [
 ];
 
 const heroStats = [
-  { value: 0, suffix: "%", label: "Platform Fee", icon: Sparkles, color: "#C2553A" },
-  { value: 50, suffix: "Cr+", label: "Funds Raised", icon: Heart, color: "#E8618C" },
-  { value: 5.5, suffix: "M+", label: "Lives Touched", icon: Shield, color: "#D4A843" },
+  { value: 0, suffix: "%", label: "Platform Fee", sublabel: "Every rupee goes to patient", icon: Sparkles, color: "#C2553A" },
+  { value: 50, suffix: "Cr+", label: "Funds Raised", sublabel: "", icon: Heart, color: "#E8618C" },
+  { value: 5.5, suffix: "M+", label: "Lives Touched", sublabel: "", icon: Shield, color: "#D4A843" },
 ];
 
 const trustPoints = [
@@ -124,13 +124,13 @@ function ScrollingMarquee() {
           {row1.map((src, i) => (
             <div
               key={`r1-${i}`}
-              className="w-[360px] h-[240px] flex-shrink-0 rounded-xl overflow-hidden"
+              className="w-[480px] h-[320px] flex-shrink-0 rounded-xl overflow-hidden"
             >
               <Image
                 src={src}
                 alt=""
-                width={360}
-                height={240}
+                width={480}
+                height={320}
                 className="w-full h-full object-cover grayscale"
               />
             </div>
@@ -144,13 +144,13 @@ function ScrollingMarquee() {
           {row2.map((src, i) => (
             <div
               key={`r2-${i}`}
-              className="w-[360px] h-[240px] flex-shrink-0 rounded-xl overflow-hidden"
+              className="w-[480px] h-[320px] flex-shrink-0 rounded-xl overflow-hidden"
             >
               <Image
                 src={src}
                 alt=""
-                width={360}
-                height={240}
+                width={480}
+                height={320}
                 className="w-full h-full object-cover grayscale"
               />
             </div>
@@ -480,7 +480,7 @@ export function Hero() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.7 }}
-              className="flex flex-wrap gap-x-6 gap-y-3"
+              className="flex flex-wrap gap-x-6 gap-y-3 mb-6"
             >
               {trustPoints.map(({ icon: Icon, text }, i) => (
                 <motion.div
@@ -496,6 +496,21 @@ export function Hero() {
                   {text}
                 </motion.div>
               ))}
+            </motion.div>
+
+            {/* Payment/trust badges */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 1.0 }}
+              className="flex items-center gap-3 text-[10px] text-muted-foreground/60"
+            >
+              <span className="uppercase tracking-[0.1em] font-medium">Secured by</span>
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 bg-foreground/5 font-semibold text-foreground/40">Razorpay</span>
+                <span className="px-2 py-0.5 bg-foreground/5 font-semibold text-foreground/40">SSL</span>
+                <span className="px-2 py-0.5 bg-foreground/5 font-semibold text-foreground/40">80G</span>
+              </div>
             </motion.div>
           </div>
 
@@ -551,6 +566,11 @@ export function Hero() {
                         <div className="text-[8px] text-muted-foreground font-medium uppercase tracking-wider mt-0.5">
                           {stat.label}
                         </div>
+                        {stat.sublabel && (
+                          <div className="text-[7px] text-varak-primary/60 font-medium mt-0.5 leading-tight">
+                            {stat.sublabel}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}

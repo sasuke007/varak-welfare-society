@@ -8,7 +8,34 @@ import {
   BadgeCheck,
   CreditCard,
   Users,
+  FileText,
+  Share2,
+  IndianRupee,
 } from "lucide-react";
+
+const steps = [
+  {
+    num: 1,
+    icon: FileText,
+    color: "#C2553A",
+    title: "Create",
+    description: "Share your story and medical details in 5 minutes",
+  },
+  {
+    num: 2,
+    icon: Share2,
+    color: "#D4A843",
+    title: "Share",
+    description: "Spread across WhatsApp, social media & your network",
+  },
+  {
+    num: 3,
+    icon: IndianRupee,
+    color: "#2E9E9E",
+    title: "Receive",
+    description: "Funds transferred to hospital within 24-48 hours",
+  },
+];
 
 const reasons = [
   {
@@ -65,7 +92,67 @@ export function WhySection() {
       <div className="ambient-orb absolute bottom-0 left-0 w-[300px] h-[300px] bg-gradient-to-tr from-varak-pink/6 to-transparent" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Header */}
+        {/* How It Works Strip */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-8"
+        >
+          <span className="inline-block text-xs font-semibold text-varak-orange uppercase tracking-[0.2em] mb-3">
+            How It Works
+          </span>
+          <h2 className="font-heading text-3xl md:text-[2.75rem] leading-tight tracking-tight mb-4">
+            Three Simple{" "}
+            <span className="text-gradient-primary">Steps</span>
+          </h2>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16 relative">
+          {/* Dashed connecting line on desktop */}
+          <div className="hidden md:block absolute top-[3.25rem] left-[16.67%] right-[16.67%] border-t-2 border-dashed border-border/40 z-0" />
+
+          {steps.map((step, i) => (
+            <motion.div
+              key={step.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{
+                delay: i * 0.12,
+                duration: 0.6,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              className="relative bg-white border border-border/40 p-6 hover-lift text-center z-10"
+            >
+              {/* Step number badge */}
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold mx-auto mb-4"
+                style={{ backgroundColor: step.color }}
+              >
+                {step.num}
+              </div>
+              {/* Icon */}
+              <div
+                className="w-12 h-12 rounded-none flex items-center justify-center mx-auto mb-4 shadow-sm"
+                style={{ backgroundColor: step.color }}
+              >
+                <step.icon className="h-5 w-5 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2 tracking-tight">
+                {step.title}
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {step.description}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Separator */}
+        <div className="section-divider mb-16" />
+
+        {/* Why Choose Varak Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

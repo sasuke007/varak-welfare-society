@@ -159,3 +159,48 @@ export async function getDistricts(stateId: string) {
     orderBy: { name: "asc" },
   });
 }
+
+export async function getRecentDonations(limit = 10) {
+  try {
+    return await prisma.donation.findMany({
+      where: { status: "COMPLETED" },
+      select: {
+        id: true,
+        amount: true,
+        donorName: true,
+        isAnonymous: true,
+        createdAt: true,
+        campaign: {
+          select: { title: true, slug: true },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    });
+  } catch {
+    return [];
+  }
+}
+
+export async function getPlatformStats() {
+  try {
+    const [campaignStats, donorStats] = await Promise.all([
+      prisma.campaign.aggregate({
+        where: { status: "APPROVED" },
+        _sum: { amountRaised: true },
+        _count: true,
+      }),
+      prisma.donation.aggregate({
+        where: { status: "COMPLETED" },
+        _count: true,
+      }),
+    ]);
+    return {
+      totalRaised: Number(campaignStats._sum.amountRaised ?? 0),
+      totalCampaigns: campaignStats._count,
+      totalDonors: donorStats._count,
+    };
+  } catch {
+    return { totalRaised: 0, totalCampaigns: 0, totalDonors: 0 };
+  }
+}

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { syncUser } from "@/server/actions/sync-user";
 import "./globals.css";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -44,11 +46,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { userId } = await auth();
+  if (userId) {
+    await syncUser();
+  }
+
   return (
     <ClerkProvider>
       <html lang="en" className={jetbrainsMono.variable}>

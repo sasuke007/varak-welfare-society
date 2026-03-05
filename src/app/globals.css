@@ -169,6 +169,24 @@
   100% { transform: translateX(0); }
 }
 
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.animate-ticker {
+  animation: ticker-scroll 40s linear infinite;
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
 /* ─── Cancer Ribbon Gradient ─── */
 .ribbon-gradient {
   background: linear-gradient(135deg, #E8618C 0%, #C2553A 20%, #D4A843 40%, #2E9E9E 60%, #E87040 80%, #E8618C 100%);
@@ -259,4 +277,35 @@ html {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: oklch(0.535 0.016 52 / 0.5);
+}
+
+/* ─── Funding Calculator Range Input ─── */
+.funding-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #C2553A;
+  border: 2px solid #fff;
+  border-radius: 0;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(194, 85, 58, 0.3);
+}
+.funding-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #C2553A;
+  border: 2px solid #fff;
+  border-radius: 0;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(194, 85, 58, 0.3);
+}
+.funding-range::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 0;
+}
+.funding-range::-moz-range-track {
+  height: 8px;
+  border-radius: 0;
+  background: var(--border);
 }

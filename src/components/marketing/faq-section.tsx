@@ -2,10 +2,20 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Shield, Lock, FileText, BadgeCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const faqs = [
+  {
+    question: "Is Varak genuine? Can I trust this platform?",
+    answer:
+      "Absolutely. Varak Cancer Welfare Society is a registered non-profit organization (Reg. No. under Societies Registration Act). We operate with full transparency — every campaign undergoes 3-tier verification (team review, admin audit, hospital confirmation), all fund transfers are tracked and reported, and our financials are audited annually. We partner with leading hospitals across India and process payments through Razorpay's secure payment gateway. Over 5 lakh donors have trusted us with their contributions.",
+  },
+  {
+    question: "How is my money used? Where exactly does it go?",
+    answer:
+      "100% of your donation goes directly to the patient's treatment. Here's the fund flow: (1) Your donation is received via Razorpay's secure gateway, (2) Funds are held in a dedicated escrow-like campaign account, (3) Upon withdrawal request, our team verifies with the treating hospital, (4) Funds are transferred directly to the hospital or patient's verified bank account within 24-48 hours. We sustain our operations through voluntary tips from donors and corporate partnerships — never from your donation amount.",
+  },
   {
     question: "How does Varak ensure 0% platform fee?",
     answer:
@@ -17,14 +27,14 @@ const faqs = [
       "Every campaign goes through a 3-tier verification process: (1) Our team reviews documents, (2) Admin verification of medical records, (3) Hospital verification of the patient and treatment plan. Only fully verified campaigns get the 'Verified' badge.",
   },
   {
-    question: "How quickly are funds transferred?",
-    answer:
-      "Once a withdrawal is requested and approved, funds are transferred directly to the hospital or patient's bank account within 24-48 business hours.",
-  },
-  {
     question: "Can I get tax benefits for my donation?",
     answer:
       "Yes! Donations made through Varak are eligible for tax deduction under Section 80G of the Income Tax Act. You'll receive a donation receipt with all necessary details for claiming the deduction.",
+  },
+  {
+    question: "How quickly are funds transferred?",
+    answer:
+      "Once a withdrawal is requested and approved, funds are transferred directly to the hospital or patient's bank account within 24-48 business hours.",
   },
   {
     question: "What cancer types do you support?",
@@ -36,6 +46,13 @@ const faqs = [
     answer:
       "Starting a fundraiser takes just 5 minutes. Click 'Start a Fundraiser', fill in the patient details, upload medical documents, set your goal amount, and share your story. Our team will review and approve your campaign within 24 hours.",
   },
+];
+
+const trustBadges = [
+  { icon: Shield, text: "Razorpay Secured" },
+  { icon: Lock, text: "SSL Encrypted" },
+  { icon: FileText, text: "80G Certified" },
+  { icon: BadgeCheck, text: "Registered NGO" },
 ];
 
 export function FAQSection() {
@@ -116,6 +133,23 @@ export function FAQSection() {
             </motion.div>
           ))}
         </div>
+
+        {/* Trust badge strip */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="flex flex-wrap justify-center gap-6 mt-12 pt-8 border-t border-border/40"
+        >
+          {trustBadges.map((badge) => (
+            <div key={badge.text} className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="w-8 h-8 rounded-none bg-white border border-border/40 flex items-center justify-center">
+                <badge.icon className="h-4 w-4 text-varak-primary/60" />
+              </div>
+              <span className="text-xs font-medium">{badge.text}</span>
+            </div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );

@@ -5,6 +5,26 @@ import { motion } from "framer-motion";
 import { ArrowRight, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+const personaPills = [
+  "Parent",
+  "Child",
+  "Spouse",
+  "Sibling",
+  "Friend",
+  "Patient",
+  "Colleague",
+  "NGO",
+];
+
+const conditionTags = [
+  "ICU",
+  "Chemotherapy",
+  "Surgery",
+  "Transplant",
+  "Radiation",
+  "Palliative Care",
+];
+
 export function CTASection() {
   return (
     <section className="relative py-24 overflow-hidden">
@@ -53,15 +73,55 @@ export function CTASection() {
             </svg>
           </div>
 
-          <h2 className="font-heading text-3xl md:text-5xl text-white mb-5 tracking-tight">
-            Your Contribution{" "}
-            <span className="italic text-varak-warm-wash">Can Save a Life</span>
+          <h2 className="font-heading text-3xl md:text-5xl text-white mb-2 tracking-tight">
+            Asking for Help Is Not a Weakness.
           </h2>
-          <p className="text-white/60 text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
-            Every donation, no matter how small, brings hope to a cancer
-            patient fighting for their life. Every ribbon color represents a battle —
-            stand with them today.
+          <p className="font-heading text-2xl md:text-4xl text-varak-warm-wash italic mb-5">
+            It&apos;s an Act of Love.
           </p>
+          <p className="text-white/60 text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
+            Every day, families like yours find the courage to ask — and
+            thousands of strangers answer.
+          </p>
+
+          {/* Persona pills */}
+          <div className="mb-3">
+            <div className="flex flex-wrap justify-center gap-2">
+              {personaPills.map((pill, i) => (
+                <motion.span
+                  key={pill}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 + i * 0.05 }}
+                  className="bg-white/10 border border-white/20 text-white text-sm px-3 py-1.5"
+                >
+                  {pill}
+                </motion.span>
+              ))}
+            </div>
+            <p className="text-white/40 text-xs mt-2.5">
+              Anyone can start a fundraiser for a cancer patient. It takes 5
+              minutes.
+            </p>
+          </div>
+
+          {/* Condition tags */}
+          <div className="flex flex-wrap justify-center gap-1.5 mb-10">
+            {conditionTags.map((tag, i) => (
+              <motion.span
+                key={tag}
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 + i * 0.04 }}
+                className="text-[11px] bg-white/5 text-white/50 px-2 py-0.5"
+              >
+                {tag}
+              </motion.span>
+            ))}
+          </div>
+
           <div className="flex flex-wrap justify-center gap-4">
             <Button
               asChild
