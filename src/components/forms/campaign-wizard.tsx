@@ -84,7 +84,14 @@ export function CampaignWizard({
       return;
     }
     if (step === 2) {
-      if (!formData.title) { setError("Campaign title is required"); return; }
+      if (!formData.title || formData.title.length < 10) {
+        setError("Title must be at least 10 characters");
+        return;
+      }
+      if (formData.title.length > 100) {
+        setError("Title must be 100 characters or less");
+        return;
+      }
       if (!formData.goalAmount || parseInt(formData.goalAmount) < 1000) {
         setError("Minimum goal amount is ₹1,000");
         return;
@@ -262,13 +269,16 @@ export function CampaignWizard({
         {step === 2 && (
           <div className="space-y-4">
             <div>
-              <Label>Campaign Title *</Label>
+              <Label>Campaign Title * (10–100 characters)</Label>
               <Input
                 value={formData.title}
                 onChange={(e) => update("title", e.target.value)}
                 placeholder="e.g., Help Priya Fight Leukemia"
                 className="mt-1"
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                {formData.title.length}/10 characters minimum
+              </p>
             </div>
             <div>
               <Label>Fundraising Goal (₹) *</Label>
