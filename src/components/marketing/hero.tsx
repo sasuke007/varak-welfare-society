@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { ArrowRight, Heart, Shield, Clock, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -93,6 +94,250 @@ const trustPoints = [
   { icon: Heart, text: "Tax Benefits under 80G" },
 ];
 
+/* Marquee images — happy families after cancer treatment */
+const marqueeRow1 = [
+  "/marquee/1.jpg",
+  "/marquee/2.jpg",
+  "/marquee/3.jpg",
+  "/marquee/4.jpg",
+  "/marquee/5.jpg",
+];
+const marqueeRow2 = [
+  "/marquee/6.jpg",
+  "/marquee/7.jpg",
+  "/marquee/8.jpg",
+  "/marquee/9.jpg",
+  "/patients/lakshmi.jpg",
+];
+
+function ScrollingMarquee() {
+  const row1 = [...marqueeRow1, ...marqueeRow1];
+  const row2 = [...marqueeRow2, ...marqueeRow2];
+
+  return (
+    <div className="absolute inset-0 overflow-hidden opacity-[0.3] z-[1] pointer-events-none">
+      <div className="absolute inset-0 flex flex-col justify-center gap-5">
+        {/* Row 1 — scrolls left */}
+        <div
+          className="flex gap-5 w-max animate-marquee-left"
+        >
+          {row1.map((src, i) => (
+            <div
+              key={`r1-${i}`}
+              className="w-[360px] h-[240px] flex-shrink-0 rounded-xl overflow-hidden"
+            >
+              <Image
+                src={src}
+                alt=""
+                width={360}
+                height={240}
+                className="w-full h-full object-cover grayscale"
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Row 2 — scrolls right */}
+        <div
+          className="flex gap-5 w-max animate-marquee-right"
+        >
+          {row2.map((src, i) => (
+            <div
+              key={`r2-${i}`}
+              className="w-[360px] h-[240px] flex-shrink-0 rounded-xl overflow-hidden"
+            >
+              <Image
+                src={src}
+                alt=""
+                width={360}
+                height={240}
+                className="w-full h-full object-cover grayscale"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const patients = [
+  {
+    name: "Priya Sharma",
+    age: 34,
+    type: "Breast Cancer",
+    color: "#E8618C",
+    image: "/patients/priya.jpg",
+    story:
+      "A mother of two from Jaipur, Priya completed 6 cycles of chemo thanks to 342 donors who believed in her fight.",
+    raised: "₹4.2L",
+    goal: "₹5L",
+    progress: 84,
+  },
+  {
+    name: "Rajesh Kumar",
+    age: 45,
+    type: "Leukemia",
+    color: "#E87040",
+    image: "/patients/rajesh.jpg",
+    story:
+      "A school teacher from Patna who received a life-saving bone marrow transplant funded entirely by this community.",
+    raised: "₹8.1L",
+    goal: "₹10L",
+    progress: 81,
+  },
+  {
+    name: "Ananya Patel",
+    age: 8,
+    type: "Childhood Cancer",
+    color: "#D4A843",
+    image: "/patients/ananya.jpg",
+    story:
+      "Little Ananya beat neuroblastoma and is back in school. Her family calls every donor their guardian angel.",
+    raised: "₹6.5L",
+    goal: "₹6.5L",
+    progress: 100,
+  },
+  {
+    name: "Mohammed Irfan",
+    age: 52,
+    type: "Prostate Cancer",
+    color: "#6B8DB2",
+    image: "/patients/mohammed.jpg",
+    story:
+      "A retired army veteran whose regiment and 200+ strangers united to fund his treatment in Lucknow.",
+    raised: "₹3.5L",
+    goal: "₹5L",
+    progress: 70,
+  },
+  {
+    name: "Lakshmi Devi",
+    age: 41,
+    type: "Ovarian Cancer",
+    color: "#2E9E9E",
+    image: "/patients/lakshmi.jpg",
+    story:
+      "A daily wage worker from Chennai whose surgery was fully funded in just 11 days by compassionate donors.",
+    raised: "₹2.8L",
+    goal: "₹3L",
+    progress: 93,
+  },
+];
+
+function PatientCarousel() {
+  const [current, setCurrent] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    if (isPaused) return;
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % patients.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, [isPaused]);
+
+  const patient = patients[current];
+
+  return (
+    <div
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      <div className="flex items-center justify-between mb-2.5">
+        <span className="text-[10px] font-semibold tracking-[0.15em] uppercase text-varak-primary/50">
+          Patient Stories
+        </span>
+        <div className="flex gap-1.5">
+          {patients.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrent(i)}
+              className={`h-1 rounded-full transition-all duration-500 ${
+                i === current
+                  ? "w-5 bg-varak-primary"
+                  : "w-1.5 bg-foreground/10 hover:bg-foreground/20"
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="glass-card rounded-none ring-1 ring-foreground/10 overflow-hidden relative min-h-[220px]">
+        {/* Colored accent bar */}
+        <div
+          className="absolute top-0 left-0 right-0 h-[3px] transition-colors duration-500"
+          style={{ backgroundColor: patient.color }}
+        />
+
+        <div className="p-5 pt-5">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={current}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -16 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="flex items-center gap-3 mb-3.5">
+                <div
+                  className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-white shadow-sm"
+                >
+                  <Image
+                    src={patient.image}
+                    alt={patient.name}
+                    width={40}
+                    height={40}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <h4 className="text-sm font-semibold text-foreground leading-tight">
+                    {patient.name}, {patient.age}
+                  </h4>
+                  <span
+                    className="inline-block text-[9px] font-semibold px-1.5 py-px rounded-sm mt-0.5 text-white tracking-wider"
+                    style={{ backgroundColor: patient.color }}
+                  >
+                    {patient.type}
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-[13px] text-muted-foreground leading-relaxed mb-4">
+                &ldquo;{patient.story}&rdquo;
+              </p>
+
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-[11px]">
+                  <span className="font-semibold text-foreground">
+                    {patient.raised} raised
+                  </span>
+                  <span className="text-muted-foreground">
+                    of {patient.goal}
+                  </span>
+                </div>
+                <div className="h-1.5 bg-foreground/5 rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full"
+                    style={{ backgroundColor: patient.color }}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${patient.progress}%` }}
+                    transition={{
+                      duration: 0.8,
+                      delay: 0.15,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
+                  />
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -108,6 +353,9 @@ export function Hero() {
       ref={containerRef}
       className="relative min-h-screen flex items-center overflow-hidden bg-varak-cream"
     >
+      {/* Scrolling image marquee — behind everything */}
+      <ScrollingMarquee />
+
       {/* Grain */}
       <div className="grain-overlay absolute inset-0 pointer-events-none z-[2]" />
 
@@ -251,75 +499,75 @@ export function Hero() {
             </motion.div>
           </div>
 
-          {/* Right — Floating stat cards — 5 cols */}
+          {/* Right — Stats + Patient carousel — 5 cols */}
           <div className="lg:col-span-5 relative">
-            <div className="relative flex flex-col gap-5">
-              {heroStats.map((stat, i) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, x: 40, rotate: 2 }}
-                  animate={{ opacity: 1, x: 0, rotate: 0 }}
-                  transition={{
-                    duration: 0.8,
-                    delay: 0.4 + i * 0.15,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
-                  className="glass-card rounded-none ring-1 ring-foreground/10 p-6 hover-lift group cursor-default"
-                >
-                  <div className="flex items-center gap-5">
-                    <div
-                      className="w-14 h-14 rounded-none flex items-center justify-center shadow-lg flex-shrink-0"
-                      style={{ backgroundColor: stat.color }}
-                    >
-                      <stat.icon className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <div className="text-3xl md:text-4xl font-heading text-foreground tracking-tight">
-                        {stat.value === 5.5 ? (
-                          <span>5.5<span className="text-varak-gold">M+</span></span>
-                        ) : stat.value === 0 ? (
-                          <span><AnimatedCounter target={0} suffix="%" /></span>
-                        ) : (
-                          <span>
-                            <AnimatedCounter target={stat.value} />
-                            <span className="text-varak-pink">{stat.suffix.replace(/[\d.]/g, "")}</span>
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-sm text-muted-foreground font-medium mt-0.5">
-                        {stat.label}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-
-              {/* Ribbon colors card */}
+            <div className="flex flex-col gap-4">
+              {/* Compact stats strip */}
               <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 1, duration: 0.6 }}
-                className="glass-card rounded-none ring-1 ring-foreground/10 p-5"
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{
+                  duration: 0.7,
+                  delay: 0.4,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="glass-card rounded-none ring-1 ring-foreground/10 p-3.5"
               >
-                <p className="text-xs font-medium text-muted-foreground mb-3">
-                  Every ribbon, one platform
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {ribbonColors.map(({ color, label }) => (
+                <div className="grid grid-cols-3 divide-x divide-foreground/8">
+                  {heroStats.map((stat) => (
                     <div
-                      key={label}
-                      className="inline-flex items-center gap-1.5 bg-white/80 rounded-none px-2.5 py-1 ring-1 ring-foreground/10"
+                      key={stat.label}
+                      className="flex items-center gap-2 justify-center px-2"
                     >
                       <div
-                        className="w-2.5 h-2.5 rounded-none flex-shrink-0"
-                        style={{ backgroundColor: color }}
-                      />
-                      <span className="text-[10px] font-medium text-foreground/70">
-                        {label}
-                      </span>
+                        className="w-7 h-7 rounded-none flex items-center justify-center flex-shrink-0 shadow-sm"
+                        style={{ backgroundColor: stat.color }}
+                      >
+                        <stat.icon className="h-3 w-3 text-white" />
+                      </div>
+                      <div>
+                        <div className="text-base font-heading text-foreground tracking-tight leading-none">
+                          {stat.value === 5.5 ? (
+                            <span>
+                              5.5
+                              <span className="text-varak-gold text-xs">
+                                M+
+                              </span>
+                            </span>
+                          ) : stat.value === 0 ? (
+                            <span>
+                              0
+                              <span className="text-varak-pink text-xs">%</span>
+                            </span>
+                          ) : (
+                            <span>
+                              <AnimatedCounter target={stat.value} />
+                              <span className="text-varak-pink text-xs">
+                                Cr+
+                              </span>
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[8px] text-muted-foreground font-medium uppercase tracking-wider mt-0.5">
+                          {stat.label}
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>
+              </motion.div>
+
+              {/* Patient carousel */}
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{
+                  duration: 0.8,
+                  delay: 0.55,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+              >
+                <PatientCarousel />
               </motion.div>
             </div>
           </div>
