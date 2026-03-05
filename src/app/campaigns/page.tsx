@@ -37,7 +37,7 @@ export default async function CampaignsPage({
   return (
     <>
       <Header
-        menuItems={menuItems.map((item) => ({
+        menuItems={menuItems.map((item: { id: string; name: string; url: string }) => ({
           id: item.id,
           name: item.name,
           url: item.url,

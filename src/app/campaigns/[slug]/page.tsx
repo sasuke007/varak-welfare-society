@@ -58,7 +58,7 @@ export default async function CampaignDetailPage({ params }: Props) {
   return (
     <>
       <Header
-        menuItems={menuItems.map((item) => ({
+        menuItems={menuItems.map((item: { id: string; name: string; url: string }) => ({
           id: item.id,
           name: item.name,
           url: item.url,

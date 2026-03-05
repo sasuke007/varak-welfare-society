@@ -1,6 +1,16 @@
 import { prisma } from "@/lib/prisma";
 
-export async function getMenuItems() {
+export type MenuItem = {
+  id: string;
+  name: string;
+  url: string;
+  order: number;
+  isActive: boolean;
+  parentId: string | null;
+  children?: MenuItem[];
+};
+
+export async function getMenuItems(): Promise<MenuItem[]> {
   return prisma.menuItem.findMany({
     where: { isActive: true, parentId: null },
     include: {
@@ -10,5 +20,5 @@ export async function getMenuItems() {
       },
     },
     orderBy: { order: "asc" },
-  });
+  }) as Promise<MenuItem[]>;
 }
