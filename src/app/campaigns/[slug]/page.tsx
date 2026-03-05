@@ -23,6 +23,7 @@ import {
   timeAgo,
   getInitials,
 } from "@/lib/utils";
+import { DonationModal } from "@/components/campaigns/donation-modal";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -297,10 +298,12 @@ export default async function CampaignDetailPage({ params }: Props) {
                   </div>
                 </div>
 
-                <Button className="w-full bg-varak-primary hover:bg-varak-primary-dark text-white h-12 text-base mb-3">
-                  <Heart className="mr-2 h-4 w-4" />
-                  Donate Now
-                </Button>
+                <DonationModal campaignId={campaign.id} campaignTitle={campaign.title}>
+                  <Button className="w-full bg-varak-primary hover:bg-varak-primary-dark text-white h-12 text-base mb-3">
+                    <Heart className="mr-2 h-4 w-4" />
+                    Donate Now
+                  </Button>
+                </DonationModal>
 
                 <Button variant="outline" className="w-full" size="sm">
                   <Share2 className="mr-2 h-3 w-3" />

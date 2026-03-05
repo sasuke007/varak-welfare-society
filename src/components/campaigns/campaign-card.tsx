@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { formatCurrency, calculateProgress, timeAgo } from "@/lib/utils";
+import { DonationModal } from "@/components/campaigns/donation-modal";
 import type { CampaignWithRelations } from "@/types";
 
 /* Map cancer types to their ribbon colors */
@@ -141,13 +142,16 @@ export function CampaignCard({
           </span>
         </div>
 
-        <Button
-          className="w-full mt-4 bg-varak-primary hover:bg-varak-primary-dark text-white rounded-none"
-          size="sm"
-        >
-          <Heart className="mr-2 h-3 w-3" />
-          Donate Now
-        </Button>
+        <DonationModal campaignId={campaign.id} campaignTitle={campaign.title}>
+          <Button
+            className="w-full mt-4 bg-varak-primary hover:bg-varak-primary-dark text-white rounded-none"
+            size="sm"
+            onClick={(e) => e.preventDefault()}
+          >
+            <Heart className="mr-2 h-3 w-3" />
+            Donate Now
+          </Button>
+        </DonationModal>
       </div>
     </Link>
   );
