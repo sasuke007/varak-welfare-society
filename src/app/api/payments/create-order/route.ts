@@ -4,10 +4,12 @@ import { auth } from "@clerk/nextjs/server";
 import { donationSchema } from "@/lib/validations/donation";
 import { prisma } from "@/lib/prisma";
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
+function getRazorpay() {
+  return new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID!,
+    key_secret: process.env.RAZORPAY_KEY_SECRET!,
+  });
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -32,7 +34,7 @@ export async function POST(req: NextRequest) {
     const totalAmount = validated.amount + validated.tipAmount;
 
     // Create Razorpay order
-    const order = await razorpay.orders.create({
+    const order = await getRazorpay().orders.create({
       amount: totalAmount * 100, // Convert to paise
       currency: "INR",
       receipt: `donation_${Date.now()}`,
