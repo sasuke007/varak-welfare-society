@@ -12,11 +12,11 @@ export default async function MarketingLayout({
   return (
     <>
       <Header
-        menuItems={menuItems.map((item) => ({
+        menuItems={menuItems.map((item: { id: string; name: string; url: string; children?: { id: string; name: string; url: string }[] }) => ({
           id: item.id,
           name: item.name,
           url: item.url,
-          children: item.children?.map((child) => ({
+          children: item.children?.map((child: { id: string; name: string; url: string }) => ({
             id: child.id,
             name: child.name,
             url: child.url,
