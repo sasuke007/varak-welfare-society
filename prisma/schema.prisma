@@ -1,0 +1,525 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  DONOR
+  FUNDRAISER
+  NGO_ADMIN
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum KycStatus {
+  NOT_SUBMITTED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum CampaignStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  COMPLETED
+  SUSPENDED
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  TEAM_VERIFIED
+  ADMIN_VERIFIED
+  HOSPITAL_VERIFIED
+  FULLY_VERIFIED
+}
+
+enum NgoVerificationStatus {
+  PENDING
+  UNDER_REVIEW
+  VERIFIED
+  REJECTED
+}
+
+enum NgoType {
+  SECTION_8
+  TRUST
+  SOCIETY
+  ASSOCIATION_OF_PERSONS
+}
+
+enum PaymentGateway {
+  RAZORPAY
+  STRIPE
+  UPI_DIRECT
+}
+
+enum DonationStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAUSED
+  CANCELLED
+  EXPIRED
+}
+
+enum SubscriptionInterval {
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum WithdrawalStatus {
+  PENDING
+  APPROVED
+  PROCESSING
+  COMPLETED
+  REJECTED
+}
+
+enum DocumentType {
+  MEDICAL_REPORT
+  HOSPITAL_BILL
+  PRESCRIPTION
+  AADHAR_CARD
+  PAN_CARD
+  BANK_STATEMENT
+  REGISTRATION_CERTIFICATE
+  LETTERHEAD
+  SIGNATORY_PAN
+  BYLAWS
+  OTHER
+}
+
+enum NotificationType {
+  DONATION_RECEIVED
+  CAMPAIGN_APPROVED
+  CAMPAIGN_REJECTED
+  WITHDRAWAL_UPDATE
+  COMMENT_RECEIVED
+  SUBSCRIPTION_UPDATE
+  KYC_UPDATE
+  SYSTEM
+}
+
+// ─── Models ──────────────────────────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  phone     String?
+  firstName String
+  lastName  String?
+  avatarUrl String?
+  role      UserRole @default(DONOR)
+
+  // KYC
+  kycStatus       KycStatus @default(NOT_SUBMITTED)
+  aadharNumber    String?
+  aadharVerified  Boolean   @default(false)
+  panNumber       String?
+  panVerified     Boolean   @default(false)
+
+  // Relations
+  campaigns      Campaign[]
+  donations      Donation[]
+  subscriptions  Subscription[]
+  withdrawals    Withdrawal[]
+  comments       Comment[]
+  documents      UserDocument[]
+  notifications  Notification[]
+  ngoMemberships NgoMember[]
+
+  // Verification actions
+  verifiedDocuments CampaignDocument[] @relation("DocumentVerifier")
+  verifiedNgos      Ngo[]              @relation("NgoVerifier")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clerkId])
+  @@index([email])
+  @@index([role])
+}
+
+model Campaign {
+  id    String @id @default(cuid())
+  slug  String @unique
+  title String
+  story String @db.Text
+
+  // Financials
+  goalAmount   Decimal @db.Decimal(12, 2)
+  amountRaised Decimal @default(0) @db.Decimal(12, 2)
+  donorCount   Int     @default(0)
+  viewCount    Int     @default(0)
+
+  // Beneficiary
+  beneficiaryName     String
+  beneficiaryRelation String?
+  beneficiaryAge      Int?
+  beneficiaryImage    String?
+
+  // Medical
+  cancerType   CancerType? @relation(fields: [cancerTypeId], references: [id])
+  cancerTypeId String?
+  hospitalName String?
+  hospitalCity String?
+
+  // Location
+  state      State?   @relation(fields: [stateId], references: [id])
+  stateId    String?
+  district   District? @relation(fields: [districtId], references: [id])
+  districtId String?
+
+  // Status & visibility
+  status             CampaignStatus     @default(DRAFT)
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  rejectionReason    String?
+  isFeatured         Boolean            @default(false)
+  isUrgent           Boolean            @default(false)
+  endDate            DateTime?
+
+  // Creator
+  createdBy   User   @relation(fields: [createdById], references: [id])
+  createdById String
+
+  // NGO (optional)
+  ngo   Ngo?    @relation(fields: [ngoId], references: [id])
+  ngoId String?
+
+  // Relations
+  donations  Donation[]
+  documents  CampaignDocument[]
+  updates    CampaignUpdate[]
+  comments   Comment[]
+  withdrawals Withdrawal[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@index([status])
+  @@index([cancerTypeId])
+  @@index([stateId])
+  @@index([isFeatured])
+  @@index([isUrgent])
+  @@index([createdById])
+}
+
+model CancerType {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  slug        String  @unique
+  description String? @db.Text
+  iconUrl     String?
+
+  campaigns Campaign[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Donation {
+  id          String @id @default(cuid())
+  amount      Decimal @db.Decimal(12, 2)
+  tipAmount   Decimal @default(0) @db.Decimal(12, 2)
+  totalAmount Decimal @db.Decimal(12, 2)
+
+  // Donor info
+  donorName   String?
+  donorEmail  String?
+  donorPhone  String?
+  isAnonymous Boolean @default(false)
+  panNumber   String? // For 80G receipt
+
+  // Payment
+  paymentGateway   PaymentGateway
+  gatewayOrderId   String?
+  gatewayPaymentId String? @unique
+  gatewaySignature String?
+  status           DonationStatus @default(PENDING)
+  receiptUrl       String?
+
+  // Relations
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  campaignId String
+
+  donor   User?   @relation(fields: [donorId], references: [id])
+  donorId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([campaignId])
+  @@index([donorId])
+  @@index([status])
+  @@index([gatewayPaymentId])
+}
+
+model SubscriptionPlan {
+  id          String             @id @default(cuid())
+  name        String
+  amount      Decimal            @db.Decimal(12, 2)
+  interval    SubscriptionInterval
+  description String?
+  isActive    Boolean            @default(true)
+
+  subscriptions Subscription[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Subscription {
+  id                    String             @id @default(cuid())
+  gatewaySubscriptionId String?            @unique
+  paymentGateway        PaymentGateway
+  status                SubscriptionStatus @default(ACTIVE)
+  nextBillingDate       DateTime?
+  cancelledAt           DateTime?
+
+  plan   SubscriptionPlan @relation(fields: [planId], references: [id])
+  planId String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Ngo {
+  id                  String              @id @default(cuid())
+  name                String
+  registrationNumber  String              @unique
+  pan                 String?
+  ngoType             NgoType
+  dateOfFormation     DateTime?
+  city                String?
+  has12A              Boolean             @default(false)
+  has80G              Boolean             @default(false)
+  verificationStatus  NgoVerificationStatus @default(PENDING)
+  rejectionReason     String?
+
+  // Bank details
+  bankAccountNumber String?
+  bankIfsc          String?
+  bankLinkedPhone   String?
+
+  // Authorized signatory
+  signatoryName String?
+
+  // Verifier
+  verifiedBy   User?   @relation("NgoVerifier", fields: [verifiedById], references: [id])
+  verifiedById String?
+
+  // Relations
+  members   NgoMember[]
+  campaigns Campaign[]
+  documents NgoDocument[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([registrationNumber])
+  @@index([verificationStatus])
+}
+
+model NgoMember {
+  id             String @id @default(cuid())
+  associationType String // CXO, Trustee, Director, Employee, Volunteer
+
+  user  User   @relation(fields: [userId], references: [id])
+  userId String
+
+  ngo   Ngo    @relation(fields: [ngoId], references: [id])
+  ngoId String
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, ngoId])
+}
+
+model CampaignDocument {
+  id       String       @id @default(cuid())
+  type     DocumentType
+  url      String
+  fileName String?
+  verified Boolean      @default(false)
+
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaignId String
+
+  verifiedBy   User?   @relation("DocumentVerifier", fields: [verifiedById], references: [id])
+  verifiedById String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([campaignId])
+}
+
+model UserDocument {
+  id       String       @id @default(cuid())
+  type     DocumentType
+  url      String
+  fileName String?
+  verified Boolean      @default(false)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model NgoDocument {
+  id       String       @id @default(cuid())
+  type     DocumentType
+  url      String
+  fileName String?
+  verified Boolean      @default(false)
+
+  ngo   Ngo    @relation(fields: [ngoId], references: [id], onDelete: Cascade)
+  ngoId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ngoId])
+}
+
+model CampaignUpdate {
+  id       String  @id @default(cuid())
+  content  String  @db.Text
+  imageUrl String?
+
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaignId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([campaignId])
+}
+
+model Comment {
+  id      String @id @default(cuid())
+  content String @db.Text
+
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  campaignId String
+
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([campaignId])
+  @@index([authorId])
+}
+
+model Withdrawal {
+  id     String           @id @default(cuid())
+  amount Decimal          @db.Decimal(12, 2)
+  status WithdrawalStatus @default(PENDING)
+  note   String?
+
+  // Bank details snapshot
+  bankAccountNumber String?
+  bankIfsc          String?
+  bankAccountName   String?
+
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+  campaignId String
+
+  requestedBy   User   @relation(fields: [requestedById], references: [id])
+  requestedById String
+
+  processedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([campaignId])
+  @@index([requestedById])
+  @@index([status])
+}
+
+model Notification {
+  id      String           @id @default(cuid())
+  type    NotificationType
+  title   String
+  message String
+  read    Boolean          @default(false)
+  link    String?
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([read])
+}
+
+model State {
+  id   String @id @default(cuid())
+  name String @unique
+  code String @unique
+
+  districts District[]
+  campaigns Campaign[]
+
+  @@index([code])
+}
+
+model District {
+  id   String @id @default(cuid())
+  name String
+
+  state   State  @relation(fields: [stateId], references: [id])
+  stateId String
+
+  campaigns Campaign[]
+
+  @@unique([name, stateId])
+  @@index([stateId])
+}
+
+model MenuItem {
+  id       String  @id @default(cuid())
+  name     String
+  url      String
+  order    Int     @default(0)
+  isActive Boolean @default(true)
+
+  parent   MenuItem?  @relation("MenuChildren", fields: [parentId], references: [id])
+  parentId String?
+  children MenuItem[] @relation("MenuChildren")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([parentId])
+  @@index([order])
+}
